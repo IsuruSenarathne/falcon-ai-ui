@@ -7,6 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export default function ChatArea({ conversations, isLoading, onConversationCreated }) {
   const [input, setInput] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pendingQuestion, setPendingQuestion] = useState(null)
   const bottomRef = useRef(null)
   const textareaRef = useRef(null)
 
@@ -19,6 +20,7 @@ export default function ChatArea({ conversations, isLoading, onConversationCreat
 
     const userQuestion = input.trim()
     setInput('')
+    setPendingQuestion(userQuestion)
     setIsSubmitting(true)
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
 
@@ -50,6 +52,7 @@ export default function ChatArea({ conversations, isLoading, onConversationCreat
       console.error('Error calling API:', error)
       alert(`Error: ${error.message}. Make sure the API server is running at ${API_BASE_URL}`)
     } finally {
+      setPendingQuestion(null)
       setIsSubmitting(false)
     }
   }
@@ -109,11 +112,21 @@ export default function ChatArea({ conversations, isLoading, onConversationCreat
           ))
         )}
 
-        {isSubmitting && (
-          <div className="message-row bot-row">
-            <div className="bot-avatar">N</div>
-            <div className="bubble bot-bubble typing-bubble">
-              <div className="typing-dots"><span /><span /><span /></div>
+        {pendingQuestion && (
+          <div className="message-pair">
+            <div className="message-row user-row">
+              <div className="bubble user-bubble">
+                <p>{pendingQuestion}</p>
+                <span className="bubble-time">
+                  {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </div>
+            <div className="message-row bot-row">
+              <div className="bot-avatar">N</div>
+              <div className="bubble bot-bubble typing-bubble">
+                <div className="typing-dots"><span /><span /><span /></div>
+              </div>
             </div>
           </div>
         )}

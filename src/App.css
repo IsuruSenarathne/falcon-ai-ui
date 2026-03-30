@@ -11,6 +11,8 @@ body {
 
 .app-container {
   display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100vh;
-  background: #0f0f11;
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0d 100%);
 }
