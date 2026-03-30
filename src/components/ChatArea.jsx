@@ -1,67 +1,56 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Send } from 'lucide-react'
 import './ChatArea.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-export default function ChatArea({ conversationId, onToggleSidebar }) {
-  const [messages, setMessages] = useState([])
+export default function ChatArea({ conversations, isLoading, onConversationCreated }) {
   const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const bottomRef = useRef(null)
+  const textareaRef = useRef(null)
 
-  // Reset messages when conversation changes
   useEffect(() => {
-    setMessages([])
-    setInput('')
-  }, [conversationId])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [conversations, isSubmitting])
 
   const handleSendMessage = async () => {
     if (input.trim() === '') return
 
     const userQuestion = input.trim()
-    const newUserMessage = {
-      id: messages.length + 1,
-      role: 'user',
-      content: userQuestion,
-    }
-
-    const updatedMessages = [...messages, newUserMessage]
-    setMessages(updatedMessages)
     setInput('')
-    setIsLoading(true)
+    setIsSubmitting(true)
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
 
     try {
       const response = await fetch(`${API_BASE_URL}/query`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         mode: 'cors',
         body: JSON.stringify({ question: userQuestion }),
       })
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`API Error: ${response.status}`)
 
       const data = await response.json()
-      const assistantMessage = {
-        id: updatedMessages.length + 1,
-        role: 'assistant',
-        content: data.answer || data.response || 'No response received',
+      const newConversation = {
+        id: Math.random(),
+        conversation_id: data.conversation_id || `conv_${Date.now()}`,
+        question: userQuestion,
+        answer: data.answer || data.response || 'No response received',
+        date: new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        created_at: new Date().toISOString(),
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      onConversationCreated(newConversation)
     } catch (error) {
       console.error('Error calling API:', error)
-      const errorMessage = {
-        id: updatedMessages.length + 1,
-        role: 'assistant',
-        content: `Error: ${error.message}. Make sure the API server is running at ${API_BASE_URL}`,
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      alert(`Error: ${error.message}. Make sure the API server is running at ${API_BASE_URL}`)
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
@@ -72,53 +61,86 @@ export default function ChatArea({ conversationId, onToggleSidebar }) {
     }
   }
 
+  const handleInput = (e) => {
+    setInput(e.target.value)
+    e.target.style.height = 'auto'
+    e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'
+  }
+
   return (
     <div className="chat-area">
       <div className="chat-header">
-        <button className="mobile-menu-btn" onClick={onToggleSidebar}>
-          ☰
-        </button>
-        <h2>Conversation {conversationId}</h2>
+        <div className="header-brand">
+          <div className="header-avatar">N</div>
+          <div>
+            <h2>AI Nemo</h2>
+            <span className="header-status">Online</span>
+          </div>
+        </div>
       </div>
 
       <div className="messages-container">
-        {messages.length === 0 ? (
-          <div className="empty-state">
-            <h3>Start a new conversation</h3>
-            <p>Ask me anything or start typing below</p>
+        {isLoading ? (
+          <div className="center-state">
+            <div className="typing-dots"><span /><span /><span /></div>
+          </div>
+        ) : conversations.length === 0 ? (
+          <div className="center-state">
+            <div className="empty-icon">💬</div>
+            <h3>Start a conversation</h3>
+            <p>Ask me anything</p>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className={`message ${msg.role}`}>
-              <div className="message-avatar">
-                {msg.role === 'user' ? '👤' : '🤖'}
+          conversations.map((conv) => (
+            <div key={conv.conversation_id} className="message-pair">
+              <div className="message-row user-row">
+                <div className="bubble user-bubble">
+                  <p>{conv.question}</p>
+                  <span className="bubble-time">{conv.date}</span>
+                </div>
               </div>
-              <div className="message-content">
-                <p>{msg.content}</p>
+              <div className="message-row bot-row">
+                <div className="bot-avatar">N</div>
+                <div className="bubble bot-bubble">
+                  <p>{conv.answer}</p>
+                </div>
               </div>
             </div>
           ))
         )}
+
+        {isSubmitting && (
+          <div className="message-row bot-row">
+            <div className="bot-avatar">N</div>
+            <div className="bubble bot-bubble typing-bubble">
+              <div className="typing-dots"><span /><span /><span /></div>
+            </div>
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
 
       <div className="input-area">
-        <div className="input-container">
+        <div className="input-wrapper">
           <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInput}
             onKeyDown={handleKeyDown}
-            placeholder="Message AI Nemo... (Shift+Enter for new line)"
-            rows="1"
-            disabled={isLoading}
+            placeholder="Message AI Nemo…"
+            rows={1}
+            disabled={isSubmitting}
           />
           <button
             onClick={handleSendMessage}
-            disabled={input.trim() === '' || isLoading}
+            disabled={input.trim() === '' || isSubmitting}
             className="send-btn"
           >
-            {isLoading ? <span className="loading-spinner">⏳</span> : <Send size={20} />}
+            <Send size={18} />
           </button>
         </div>
+        <p className="input-hint">Enter to send · Shift+Enter for new line</p>
       </div>
     </div>
   )
