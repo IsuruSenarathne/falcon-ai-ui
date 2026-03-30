@@ -1,6 +1,6 @@
-# AI Nemo - React Chat UI
+# FalconAI - React Chat UI
 
-A simple React app with a Claude AI-like interface featuring a left sidebar with conversations and a main chat area with message input.
+A simple React app interface for falcon AI backend service
 
 ## Features
 
