@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import MessageInput from './MessageInput'
 import TypingIndicator from './TypingIndicator'
-import { sendMessage } from '../../api/conversationService'
+import { sendMessage, createConversation } from '../../api/conversationService'
 import './ChatArea.css'
 
 export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
@@ -24,12 +24,16 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
     setPendingQuestion(question)
     setIsSubmitting(true)
     try {
-      const data = await sendMessage(conversation.conversation_id, question)
+      const isTemp = conversation.isTemp
+      const data = isTemp
+        ? await createConversation(question)
+        : await sendMessage(conversation.conversation_id, question)
       const now = new Date().toISOString()
       onMessagesAdded(
         data.conversation_id || conversation.conversation_id,
         { message_id: `user_${Date.now()}`, role: 'user', content: question, created_at: now },
-        { message_id: data.message_id || `bot_${Date.now()}`, role: 'bot', content: data.answer || data.response || 'No response received', created_at: now }
+        { message_id: data.message_id || `bot_${Date.now()}`, role: 'bot', content: data.answer || data.response || 'No response received', created_at: now },
+        isTemp ? conversation.conversation_id : null
       )
     } catch (err) {
       console.error('Failed to send message:', err)

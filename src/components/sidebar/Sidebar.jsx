@@ -1,13 +1,17 @@
 import React from 'react'
+import { Plus } from 'lucide-react'
 import ConversationItem from './ConversationItem'
 import './Sidebar.css'
 
-export default function Sidebar({ conversations, selectedId, onSelect, isLoading }) {
+export default function Sidebar({ conversations, selectedId, onSelect, onNew, isLoading }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">N</div>
         <h1 className="sidebar-title">AI Nemo</h1>
+        <button className="new-chat-btn" onClick={onNew} title="New conversation">
+          <Plus size={16} />
+        </button>
       </div>
 
       <div className="sidebar-section-label">Conversations</div>

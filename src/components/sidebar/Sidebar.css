@@ -18,6 +18,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-content: space-between;
 }
 
 .sidebar-logo {
@@ -38,6 +39,28 @@
   font-size: 16px;
   font-weight: 700;
   color: #fff;
+  flex: 1;
+}
+
+.new-chat-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid #3f3f46;
+  background: transparent;
+  color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.new-chat-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 .sidebar-section-label {

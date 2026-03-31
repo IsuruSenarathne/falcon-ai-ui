@@ -19,6 +19,19 @@ export async function getMessages(conversationId) {
   return data.messages || []
 }
 
+export async function createConversation(question, userId) {
+  const body = { question }
+  if (userId) body.user_id = userId
+  const res = await fetch(`${API_BASE_URL}/conversations`, {
+    method: 'POST',
+    headers,
+    mode: 'cors',
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`API Error: ${res.status}`)
+  return res.json()
+}
+
 export async function sendMessage(conversationId, question) {
   const res = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
     method: 'POST',

@@ -51,8 +51,24 @@ export function useConversations() {
     }
   }
 
-  const addMessages = (conversationId, userMsg, botMsg) => {
+  const newConversation = () => {
+    const tempId = `new_${Date.now()}`
+    setConversations((prev) => [
+      { conversation_id: tempId, title: null, created_at: new Date().toISOString(), messages: [], messagesLoaded: true, isTemp: true },
+      ...prev,
+    ])
+    setSelectedId(tempId)
+  }
+
+  const addMessages = (conversationId, userMsg, botMsg, tempId) => {
     setConversations((prev) => {
+      if (tempId) {
+        return prev.map((c) =>
+          c.conversation_id === tempId
+            ? { ...c, conversation_id: conversationId, isTemp: false, messages: [userMsg, botMsg], messagesLoaded: true }
+            : c
+        )
+      }
       const exists = prev.find((c) => c.conversation_id === conversationId)
       if (exists) {
         return prev.map((c) =>
@@ -62,13 +78,7 @@ export function useConversations() {
         )
       }
       return [
-        {
-          conversation_id: conversationId,
-          title: null,
-          created_at: userMsg.created_at,
-          messages: [userMsg, botMsg],
-          messagesLoaded: true,
-        },
+        { conversation_id: conversationId, title: null, created_at: userMsg.created_at, messages: [userMsg, botMsg], messagesLoaded: true },
         ...prev,
       ]
     })
@@ -85,5 +95,6 @@ export function useConversations() {
     isLoadingMessages,
     setSelectedId,
     addMessages,
+    newConversation,
   }
 }

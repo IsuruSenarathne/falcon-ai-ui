@@ -12,6 +12,7 @@ export default function App() {
     isLoadingMessages,
     setSelectedId,
     addMessages,
+    newConversation,
   } = useConversations()
 
   return (
@@ -20,6 +21,7 @@ export default function App() {
         conversations={conversations}
         selectedId={selectedId}
         onSelect={setSelectedId}
+        onNew={newConversation}
         isLoading={isLoadingList}
       />
       <ChatArea
