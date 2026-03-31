@@ -23,7 +23,7 @@ export function useConversations() {
     setIsLoadingList(true)
     try {
       const convs = await getConversations()
-      const initialised = convs.map((c) => ({ ...c, messages: [], messagesLoaded: false }))
+      const initialised = convs.map((c) => ({ ...c, messages: c.messages || [], messagesLoaded: Array.isArray(c.messages) && c.messages.length > 0 }))
       setConversations(initialised)
       if (initialised.length > 0) setSelectedId(initialised[0].conversation_id)
     } catch (err) {
