@@ -9,7 +9,9 @@ export default function MessageBubble({ message }) {
     <div className={`message-row ${isUser ? 'user-row' : 'bot-row'}`}>
       {!isUser && <div className="bot-avatar">N</div>}
       <div className={`bubble ${isUser ? 'user-bubble' : 'bot-bubble'}`}>
-        <p>{message.content}</p>
+        {isUser || typeof message.content === 'string' && !/<[a-z][\s\S]*>/i.test(message.content)
+          ? <p>{message.content}</p>
+          : <div dangerouslySetInnerHTML={{ __html: message.content }} />}
         <span className="bubble-time">{formatTime(message.created_at)}</span>
       </div>
     </div>
