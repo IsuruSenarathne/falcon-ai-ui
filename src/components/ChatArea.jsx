@@ -4,16 +4,25 @@ import './ChatArea.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
+export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
   const [input, setInput] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pendingQuestion, setPendingQuestion] = useState(null)
   const bottomRef = useRef(null)
   const textareaRef = useRef(null)
 
+  const messages = conversation?.messages || []
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, pendingQuestion])
+
+  // Clear pending state when conversation switches
+  useEffect(() => {
+    setPendingQuestion(null)
+    setInput('')
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+  }, [conversation?.conversation_id])
 
   const handleSendMessage = async () => {
     if (input.trim() === '') return
@@ -25,7 +34,8 @@ export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
 
     try {
-      const response = await fetch(`${API_BASE_URL}/query`, {
+      const convId = conversation?.conversation_id
+      const response = await fetch(`${API_BASE_URL}/conversations/${convId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         mode: 'cors',
@@ -38,6 +48,7 @@ export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
       const now = new Date().toISOString()
 
       onMessagesAdded(
+        data.conversation_id || convId,
         { message_id: `user_${Date.now()}`, role: 'user', content: userQuestion, created_at: now },
         { message_id: data.message_id || `bot_${Date.now()}`, role: 'bot', content: data.answer || data.response || 'No response received', created_at: now }
       )
@@ -63,6 +74,9 @@ export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
     e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'
   }
 
+  const formatTime = (isoString) =>
+    new Date(isoString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
   return (
     <div className="chat-area">
       <div className="chat-header">
@@ -80,11 +94,17 @@ export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
           <div className="center-state">
             <div className="typing-dots"><span /><span /><span /></div>
           </div>
-        ) : messages.length === 0 && !pendingQuestion ? (
+        ) : !conversation ? (
           <div className="center-state">
             <div className="empty-icon">💬</div>
             <h3>Start a conversation</h3>
             <p>Ask me anything</p>
+          </div>
+        ) : messages.length === 0 && !pendingQuestion ? (
+          <div className="center-state">
+            <div className="empty-icon">💬</div>
+            <h3>No messages yet</h3>
+            <p>Send your first message below</p>
           </div>
         ) : (
           messages.map((msg) => (
@@ -92,9 +112,7 @@ export default function ChatArea({ messages, isLoading, onMessagesAdded }) {
               {msg.role === 'bot' && <div className="bot-avatar">N</div>}
               <div className={`bubble ${msg.role === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
                 <p>{msg.content}</p>
-                <span className="bubble-time">
-                  {new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                </span>
+                <span className="bubble-time">{formatTime(msg.created_at)}</span>
               </div>
             </div>
           ))

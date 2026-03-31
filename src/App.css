@@ -13,6 +13,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   height: 100vh;
+  padding: 0 24px;
   background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0d 100%);
 }
