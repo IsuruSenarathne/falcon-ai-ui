@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getConversations, getMessages } from '../api/conversationService'
+import { getConversations, getMessages, deleteConversation as apiDeleteConversation } from '../api/conversationService'
 
 export function useConversations() {
   const [conversations, setConversations] = useState([])
@@ -85,6 +85,29 @@ export function useConversations() {
     setSelectedId(conversationId)
   }
 
+  const deleteConversation = async (conversationId) => {
+    if (conversationId.startsWith('new_')) {
+      setConversations((prev) => prev.filter((c) => c.conversation_id !== conversationId))
+      if (selectedId === conversationId) {
+        const remaining = conversations.filter((c) => c.conversation_id !== conversationId)
+        setSelectedId(remaining.length > 0 ? remaining[0].conversation_id : null)
+      }
+      return
+    }
+    try {
+      await apiDeleteConversation(conversationId)
+      setConversations((prev) => {
+        const remaining = prev.filter((c) => c.conversation_id !== conversationId)
+        if (selectedId === conversationId) {
+          setSelectedId(remaining.length > 0 ? remaining[0].conversation_id : null)
+        }
+        return remaining
+      })
+    } catch (err) {
+      console.error('Failed to delete conversation:', err)
+    }
+  }
+
   const selectedConversation = conversations.find((c) => c.conversation_id === selectedId) || null
 
   return {
@@ -96,5 +119,6 @@ export function useConversations() {
     setSelectedId,
     addMessages,
     newConversation,
+    deleteConversation,
   }
 }

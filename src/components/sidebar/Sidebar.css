@@ -129,9 +129,36 @@
   color: #a5b4fc;
 }
 
+.sidebar-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .sidebar-item-date {
   font-size: 11px;
   color: #52525b;
+}
+
+.sidebar-item-delete {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #52525b;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  line-height: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.sidebar-item:hover .sidebar-item-delete {
+  display: flex;
+}
+
+.sidebar-item-delete:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
 }
 
 @media (max-width: 768px) {

@@ -32,6 +32,15 @@ export async function createConversation(question, userId) {
   return res.json()
 }
 
+export async function deleteConversation(conversationId) {
+  const res = await fetch(`${API_BASE_URL}/conversations/${conversationId}`, {
+    method: 'DELETE',
+    headers,
+    mode: 'cors',
+  })
+  if (!res.ok) throw new Error(`API Error: ${res.status}`)
+}
+
 export async function sendMessage(conversationId, question) {
   const res = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
     method: 'POST',

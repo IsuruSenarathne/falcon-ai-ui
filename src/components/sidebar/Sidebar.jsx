@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import ConversationItem from './ConversationItem'
 import './Sidebar.css'
 
-export default function Sidebar({ conversations, selectedId, onSelect, onNew, isLoading }) {
+export default function Sidebar({ conversations, selectedId, onSelect, onNew, onDelete, isLoading }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -28,6 +28,7 @@ export default function Sidebar({ conversations, selectedId, onSelect, onNew, is
               conversation={conv}
               isActive={conv.conversation_id === selectedId}
               onSelect={onSelect}
+              onDelete={onDelete}
             />
           ))
         )}

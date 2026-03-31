@@ -13,6 +13,7 @@ export default function App() {
     setSelectedId,
     addMessages,
     newConversation,
+    deleteConversation,
   } = useConversations()
 
   return (
@@ -22,6 +23,7 @@ export default function App() {
         selectedId={selectedId}
         onSelect={setSelectedId}
         onNew={newConversation}
+        onDelete={deleteConversation}
         isLoading={isLoadingList}
       />
       <ChatArea
