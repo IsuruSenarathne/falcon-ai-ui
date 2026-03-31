@@ -51,3 +51,27 @@ export async function sendMessage(conversationId, question) {
   if (!res.ok) throw new Error(`API Error: ${res.status}`)
   return res.json()
 }
+
+export async function searchConversation(conversationId, question) {
+  const res = await fetch(`${API_BASE_URL}/conversations/${conversationId}/search`, {
+    method: 'POST',
+    headers,
+    mode: 'cors',
+    body: JSON.stringify({ question }),
+  })
+  if (!res.ok) throw new Error(`API Error: ${res.status}`)
+  return res.json()
+}
+
+export async function createConversationWithSearch(question, userId) {
+  const body = { question }
+  if (userId) body.user_id = userId
+  const res = await fetch(`${API_BASE_URL}/conversations/search`, {
+    method: 'POST',
+    headers,
+    mode: 'cors',
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`API Error: ${res.status}`)
+  return res.json()
+}

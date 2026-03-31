@@ -2,13 +2,15 @@ import React, { useState, useRef, useEffect } from 'react'
 import MessageBubble from './MessageBubble'
 import MessageInput from './MessageInput'
 import TypingIndicator from './TypingIndicator'
-import { sendMessage, createConversation } from '../../api/conversationService'
+import { sendMessage, createConversation, searchConversation, createConversationWithSearch } from '../../api/conversationService'
+import { useTheme } from '../../hooks/useTheme'
 import './ChatArea.css'
 
 export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pendingQuestion, setPendingQuestion] = useState(null)
   const bottomRef = useRef(null)
+  const { theme, toggleTheme } = useTheme()
 
   const messages = conversation?.messages || []
 
@@ -79,6 +81,9 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
             <span className="header-status">Online</span>
           </div>
         </div>
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
 
       <div className="messages-container">

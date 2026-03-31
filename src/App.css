@@ -13,5 +13,5 @@ body {
   display: flex;
   align-items: stretch;
   height: 100vh;
-  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0d 100%);
+  background: var(--bg);
 }
