@@ -20,7 +20,7 @@ export async function getMessages(conversationId) {
 }
 
 export async function createConversation(question, userId, type = 'default') {
-  const body = { question, type }
+  const body = { question, context_type: type }
   if (userId) body.user_id = userId
   const res = await fetch(`${API_BASE_URL}/conversations`, {
     method: 'POST',
@@ -46,7 +46,7 @@ export async function sendMessage(conversationId, question, type = 'default') {
     method: 'POST',
     headers,
     mode: 'cors',
-    body: JSON.stringify({ question, type }),
+    body: JSON.stringify({ question, context_type: type }),
   })
   if (!res.ok) throw new Error(`API Error: ${res.status}`)
   return res.json()

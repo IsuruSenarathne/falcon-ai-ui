@@ -31,7 +31,6 @@ export default function MessageInput({ onSend, disabled }) {
     if (input.trim() === '') return
     onSend(input.trim(), queryType)
     setInput('')
-    setQueryType('default')
     setShowTypeDropdown(false)
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
   }
