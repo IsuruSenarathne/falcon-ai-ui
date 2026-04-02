@@ -22,14 +22,14 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
     setPendingQuestion(null)
   }, [conversation?.conversation_id])
 
-  const handleSend = async (question) => {
+  const handleSend = async (question, queryType = 'default') => {
     setPendingQuestion(question)
     setIsSubmitting(true)
     try {
       const isTemp = conversation.isTemp
       const data = isTemp
-        ? await createConversation(question)
-        : await sendMessage(conversation.conversation_id, question)
+        ? await createConversation(question, undefined, queryType)
+        : await sendMessage(conversation.conversation_id, question, queryType)
       const now = new Date().toISOString()
       onMessagesAdded(
         data.conversation_id || conversation.conversation_id,
