@@ -285,6 +285,70 @@
   border-radius: 18px 18px 18px 4px;
 }
 
+.structured-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.answer-section p {
+  margin: 0;
+}
+
+.reasoning-toggle {
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: inherit;
+  margin-top: 4px;
+  text-decoration: none;
+}
+
+.reasoning-toggle:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.reasoning-section {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  border-left: 3px solid rgba(99, 102, 241, 0.4);
+  margin-top: 4px;
+  animation: slideDown 0.2s ease;
+}
+
+.reasoning-section p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
 .bubble-time {
   display: block;
   font-size: 11px;

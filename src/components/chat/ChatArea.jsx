@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import MessageBubble from './MessageBubble'
+import MessageBubbleV2 from './MessageBubbleV2'
 import MessageInput from './MessageInput'
 import TypingIndicator from './TypingIndicator'
 import { sendMessage, createConversation, searchConversation, createConversationWithSearch } from '../../api/conversationService'
@@ -31,10 +31,17 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
         ? await createConversation(question, undefined, queryType)
         : await sendMessage(conversation.conversation_id, question, queryType)
       const now = new Date().toISOString()
+
+      // Parse response - if it has both answer and reasoning, store as JSON
+      let botContent = data.answer || data.response || 'No response received'
+      if (data.answer && data.reasoning) {
+        botContent = JSON.stringify({ answer: data.answer, reasoning: data.reasoning })
+      }
+
       onMessagesAdded(
         data.conversation_id || conversation.conversation_id,
         { message_id: `user_${Date.now()}`, role: 'user', content: question, created_at: now },
-        { message_id: data.message_id || `bot_${Date.now()}`, role: 'bot', content: data.answer || data.response || 'No response received', created_at: now },
+        { message_id: data.message_id || `bot_${Date.now()}`, role: 'bot', content: botContent, created_at: now },
         isTemp ? conversation.conversation_id : null
       )
     } catch (err) {
@@ -68,7 +75,7 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
         </div>
       )
     }
-    return messages.map((msg) => <MessageBubble key={msg.message_id} message={msg} />)
+    return messages.map((msg) => <MessageBubbleV2 key={msg.message_id} message={msg} />)
   }
 
   return (
@@ -91,7 +98,7 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
 
         {pendingQuestion && (
           <>
-            <MessageBubble
+            <MessageBubbleV2
               message={{ message_id: 'pending-user', role: 'user', content: pendingQuestion, created_at: new Date().toISOString() }}
             />
             <TypingIndicator />
