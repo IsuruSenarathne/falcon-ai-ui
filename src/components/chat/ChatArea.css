@@ -584,6 +584,88 @@
   color: #6366f1;
 }
 
+/* ── Dislike Input ──────────────────────────────── */
+.dislike-input-container {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.2s ease;
+}
+
+.dislike-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 100px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dislike-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.dislike-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.dislike-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dislike-input-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.dislike-submit-btn,
+.dislike-cancel-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.dislike-submit-btn {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.dislike-submit-btn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+}
+
+.dislike-cancel-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.dislike-submit-btn:disabled,
+.dislike-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Mobile ─────────────────────────────────────── */
 @media (max-width: 640px) {
   .chat-area {

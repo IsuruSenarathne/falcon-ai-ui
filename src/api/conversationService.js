@@ -76,19 +76,25 @@ export async function createConversationWithSearch(question, userId) {
   return res.json()
 }
 
-export async function submitFeedback(conversationId, userMsgId, botMsgId, userQuestion, botAnswer, isPositive) {
+export async function submitFeedback(conversationId, userMsgId, botMsgId, userQuestion, botAnswer, isPositive, reason = '') {
+  const body = {
+    conversation_id: conversationId,
+    user_msg_id: userMsgId,
+    bot_msg_id: botMsgId,
+    user_question: userQuestion,
+    bot_answer: botAnswer,
+    is_positive: isPositive,
+  }
+
+  if (reason) {
+    body.reason = reason
+  }
+
   const res = await fetch(`${API_BASE_URL}/feedback`, {
     method: 'POST',
     headers,
     mode: 'cors',
-    body: JSON.stringify({
-      conversation_id: conversationId,
-      user_msg_id: userMsgId,
-      bot_msg_id: botMsgId,
-      user_question: userQuestion,
-      bot_answer: botAnswer,
-      is_positive: isPositive,
-    }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`API Error: ${res.status}`)
   return res.json()
