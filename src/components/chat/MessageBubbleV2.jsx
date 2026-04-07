@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
+import { submitFeedback } from '../../api/conversationService'
 
 const formatTime = (isoString) =>
   new Date(isoString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 
-export default function MessageBubbleV2({ message }) {
+export default function MessageBubbleV2({ message, conversationId, userMsgId, userQuestion }) {
   const isUser = message.role === 'user'
   const [showReasoning, setShowReasoning] = useState(false)
+  const [feedback, setFeedback] = useState(null) // 'positive', 'negative', or null
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Try to parse structured format (answer + reasoning)
   let isStructured = false
@@ -32,6 +35,22 @@ export default function MessageBubbleV2({ message }) {
       }
     } catch (e) {
       // Not structured format, treat as regular message
+    }
+  }
+
+  const handleFeedback = async (isPositive) => {
+    if (!conversationId || !userMsgId || !userQuestion) return
+
+    setIsSubmitting(true)
+    try {
+      const botAnswer = isStructured ? answer : message.content
+      await submitFeedback(conversationId, userMsgId, message.message_id, userQuestion, botAnswer, isPositive)
+      setFeedback(isPositive ? 'positive' : 'negative')
+    } catch (err) {
+      console.error('Failed to submit feedback:', err)
+      alert('Failed to submit feedback')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -70,6 +89,29 @@ export default function MessageBubbleV2({ message }) {
         )}
 
         <span className="bubble-time">{formatTime(message.created_at)}</span>
+
+        {!isUser && (
+          <div className="feedback-buttons">
+            <button
+              className={`feedback-btn like-btn ${feedback === 'positive' ? 'active' : ''}`}
+              onClick={() => handleFeedback(true)}
+              disabled={isSubmitting || feedback !== null}
+              title="This response was helpful"
+              aria-label="Like this response"
+            >
+              👍
+            </button>
+            <button
+              className={`feedback-btn dislike-btn ${feedback === 'negative' ? 'active' : ''}`}
+              onClick={() => handleFeedback(false)}
+              disabled={isSubmitting || feedback !== null}
+              title="This response was not helpful"
+              aria-label="Dislike this response"
+            >
+              👎
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

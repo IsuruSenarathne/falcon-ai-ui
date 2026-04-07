@@ -32,11 +32,14 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
         : await sendMessage(conversation.conversation_id, question, queryType)
       const now = new Date().toISOString()
 
-      // Parse response - if it has both answer and reasoning, store as JSON
-      let botContent = data.answer || data.response || 'No response received'
-      if (data.answer && data.reasoning) {
-        botContent = JSON.stringify({ answer: data.answer, reasoning: data.reasoning })
-      }
+      // Extract answer and reasoning from data.data structure
+      const answer = data.data?.answer || data.answer || 'No response received'
+      const reasoning = data.data?.reasoning || data.reasoning
+
+      // Create message content with answer and reasoning if both exist
+      const botContent = reasoning
+        ? JSON.stringify({ answer, reasoning })
+        : answer
 
       onMessagesAdded(
         data.conversation_id || conversation.conversation_id,
@@ -75,7 +78,28 @@ export default function ChatArea({ conversation, isLoading, onMessagesAdded }) {
         </div>
       )
     }
-    return messages.map((msg) => <MessageBubbleV2 key={msg.message_id} message={msg} />)
+    return messages.map((msg, idx) => {
+      let userMsgId = null
+      let userQuestion = null
+
+      if (msg.role === 'bot' && idx > 0) {
+        const prevMsg = messages[idx - 1]
+        if (prevMsg.role === 'user') {
+          userMsgId = prevMsg.message_id
+          userQuestion = prevMsg.content
+        }
+      }
+
+      return (
+        <MessageBubbleV2
+          key={msg.message_id}
+          message={msg}
+          conversationId={conversation.conversation_id}
+          userMsgId={userMsgId}
+          userQuestion={userQuestion}
+        />
+      )
+    })
   }
 
   return (
