@@ -40,6 +40,8 @@ export default function MessageBubbleV2({ message, conversationId, userMsgId, us
     }
   }
 
+  const containsHtml = (text) => typeof text === 'string' && /<[a-z][\s\S]*>/i.test(text)
+
   const handleFeedback = (isPositive) => {
     if (!conversationId || !userMsgId || !userQuestion) return
 
@@ -73,7 +75,11 @@ export default function MessageBubbleV2({ message, conversationId, userMsgId, us
         {isStructured ? (
           <div className="structured-message">
             <div className="answer-section">
-              <p>{answer}</p>
+              {containsHtml(answer) ? (
+                <div className="html-content" dangerouslySetInnerHTML={{ __html: answer }} />
+              ) : (
+                <p>{answer}</p>
+              )}
             </div>
 
             <button
@@ -86,13 +92,17 @@ export default function MessageBubbleV2({ message, conversationId, userMsgId, us
 
             {showReasoning && (
               <div className="reasoning-section">
-                <p>{reasoning}</p>
+                {containsHtml(reasoning) ? (
+                  <div className="html-content" dangerouslySetInnerHTML={{ __html: reasoning }} />
+                ) : (
+                  <p>{reasoning}</p>
+                )}
               </div>
             )}
           </div>
         ) : (
           <>
-            {isUser || (typeof message.content === 'string' && !/<[a-z][\s\S]*>/i.test(message.content)) ? (
+            {isUser || (typeof message.content === 'string' && !containsHtml(message.content)) ? (
               <p>{message.content}</p>
             ) : (
               <div className="html-content" dangerouslySetInnerHTML={{ __html: message.content }} />
